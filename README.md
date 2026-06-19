@@ -120,11 +120,3 @@ When first booting the application, the database will be empty.
 
 * B.Tech Computer Science and Engineering
 * [LinkedIn](https://www.google.com/search?q=your-linkedin-url) | [GitHub](https://www.google.com/search?q=your-github-url)
-
-```
-
-***
-
-### Quick Tips for Final Polish:
-* **Replace the URLs:** Don't forget to swap out `your-username/your-repo-name.git` and the social links at the bottom with your actual URLs.
-* **Add Screenshots:** Once everything is live on Vercel, take a clean screenshot of the Login screen and the Admin Dashboard. Create an `assets` folder in your repo, upload the images, and link them at the top of the README right below the title. Visuals drastically increase the impact of a portfolio project.
