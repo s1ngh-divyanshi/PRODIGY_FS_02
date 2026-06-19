@@ -113,10 +113,3 @@ When first booting the application, the database will be empty.
 4. Registering a standard **User** account will only display the read-only dashboard.
 
 ---
-
-## 👨‍💻 Author
-
-**Divyanshi Singh**
-
-* B.Tech Computer Science and Engineering
-* [LinkedIn](https://www.google.com/search?q=your-linkedin-url) | [GitHub](https://www.google.com/search?q=your-github-url)
