@@ -17,6 +17,14 @@ app.use(cors({
 
 app.use(express.json());
 
+console.log("=== SERVER BOOT SEQUENCE ===");
+if (!process.env.MONGO_URI) {
+    console.log("❌ ERROR: MONGO_URI is completely UNDEFINED inside the code!");
+} else {
+    // Only print the first 20 characters so we don't leak your password in the logs
+    console.log("🟢 MONGO_URI exists! It starts with: " + process.env.MONGO_URI.substring(0, 20));
+}
+
 // FIXED: Using 127.0.0.1 instead of localhost avoids Node.js IPv6 resolution issues
 const mongoURI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/employeeDB';
 

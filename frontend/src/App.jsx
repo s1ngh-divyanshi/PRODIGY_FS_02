@@ -21,8 +21,8 @@ function App() {
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const [employeeToEdit, setEmployeeToEdit] = useState(null);
 
-  const API_URL = 'http://localhost:5001/api/employees';
-  const AUTH_URL = 'http://localhost:5001/api/auth';
+  const API_URL = 'https://prodigy-fs-02-133734452521.asia-south1.run.app/api/employees';
+  const AUTH_URL = 'https://prodigy-fs-02-133734452521.asia-south1.run.app/api/auth';
 
   const getAuthHeaders = () => ({ headers: { Authorization: `Bearer ${token}` } });
 
