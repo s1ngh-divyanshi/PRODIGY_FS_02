@@ -26,9 +26,9 @@ if (!process.env.MONGO_URI) {
 }
 
 // FIXED: Using 127.0.0.1 instead of localhost avoids Node.js IPv6 resolution issues
-// const mongoURI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/employeeDB';
+const mongoURI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/employeeDB';
 
-mongoose.connect("mongodb+srv://admin:F2Km3UD0qZPKWY0P@my-first-cluster.s8ve4eo.mongodb.net/?appName=my-first-cluster?retryWrites=true&w=majority")
+mongoose.connect(mongoURI)
     .then(() => console.log("🟢 Successfully connected to MongoDB"))
     .catch((err) => {
         console.error("🔴 MongoDB connection ERROR:");
