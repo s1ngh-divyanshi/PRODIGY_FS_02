@@ -16,14 +16,17 @@ const app = express();
 app.use(cors({
     origin: function (origin, callback) {
         if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) === -1) {
-            var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-            return callback(new Error(msg), false);
+        
+        // Allow local development OR Vercel deployment link under your profile
+        if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('vercel.app')) {
+            return callback(null, true);
+        } else {
+            return callback(null, false);
         }
-        return callback(null, true);
     },
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
