@@ -1,4 +1,7 @@
 // production test
+const [emailError, setEmailError] = useState('');
+const [passwordError, setPasswordError] = useState('');
+const [generalError, setGeneralError] = useState('');
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
@@ -80,16 +83,25 @@ function App() {
     e.preventDefault();
     setError(null);
     try {
-      if (editId) {
-        await axios.put(`${API_URL}/${editId}`, formData, getAuthHeaders());
-        setEditId(null);
-      } else {
-        await axios.post(API_URL, formData, getAuthHeaders());
-      }
-      setFormData({ name: '', position: '', department: '' });
-      fetchEmployees();
+        // Clear previous errors before sending request
+        setEmailError('');
+        setPasswordError('');
+        setGeneralError('');
+
+        await axios.post('https://YOUR_BACKEND_URL/api/auth/register', { email, password, role });
+        // Handle successful registration here (e.g., redirect or login)
+
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to save employee.");
+        const serverMessage = err.response?.data?.message || "";
+        
+        // Parse the message string to find the culprit
+        if (serverMessage.toLowerCase().includes('email')) {
+            setEmailError('Please enter a valid email address.');
+        } else if (serverMessage.toLowerCase().includes('password')) {
+            setPasswordError('Password must be at least 8 characters long.');
+        } else {
+            setGeneralError(serverMessage || 'An unexpected error occurred.');
+        }
     }
   };
 
@@ -119,21 +131,31 @@ function App() {
           <h2>{isRegisterMode ? "Create Account" : "System Login"}</h2>
           {authError && <div className="error-banner">{authError}</div>}
           
-          <form onSubmit={handleAuthSubmit} className="employee-form auth-form">
-            <input type="text" name="username" placeholder="Username" value={authData.username} onChange={handleAuthChange} required />
-            <input type="password" name="password" placeholder="Password" value={authData.password} onChange={handleAuthChange} required />
-            
-            {/* Role Selector (Only visible during registration) */}
-            {isRegisterMode && (
-              <select name="role" value={authData.role} onChange={handleAuthChange} className="role-select">
-                <option value="user">Standard User (View Only)</option>
-                <option value="admin">Administrator (Full Access)</option>
-              </select>
-            )}
+          <form onSubmit={handleRegister}> {generalError && <div className="error-general">{generalError}</div>}
 
-            <button type="submit" className="btn btn-primary">
-              {isRegisterMode ? "Register" : "Login"}
-            </button>
+            <div className="input-group">
+                <label>Email</label>
+                <input 
+                    type="email" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{ borderColor: emailError ? '#ef4444' : '' }} 
+                />
+                {emailError && <span style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px', display: 'block' }}>{emailError}</span>}
+            </div>
+
+            <div className="input-group" style={{ marginTop: '15px' }}>
+                <label>Password</label>
+                <input 
+                    type="password" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)}
+                    style={{ borderColor: passwordError ? '#ef4444' : '' }} 
+                />
+                {passwordError && <span style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px', display: 'block' }}>{passwordError}</span>}
+            </div>
+
+              <button type="submit">Register</button>
           </form>
           
           <p className="auth-toggle" onClick={() => setIsRegisterMode(!isRegisterMode)}>
