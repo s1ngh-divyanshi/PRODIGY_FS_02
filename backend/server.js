@@ -3,14 +3,25 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://prodigy-fs-02-murex.vercel.app/'
+];
+
 const employeeRoutes = require('./routes/employeeRoutes');
 const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
-// Explicitly allow your Vite frontend to communicate with this backend
 app.use(cors({
-    origin: 'http://localhost:5173', // Your React app's URL
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
