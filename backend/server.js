@@ -26,15 +26,16 @@ if (!process.env.MONGO_URI) {
 }
 
 // FIXED: Using 127.0.0.1 instead of localhost avoids Node.js IPv6 resolution issues
-const mongoURI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/employeeDB';
+const mongoURI = process.env.MONGO_URI;
 
-mongoose.connect(mongoURI)
-    .then(() => console.log("🟢 Successfully connected to MongoDB"))
-    .catch((err) => {
-        console.error("🔴 MongoDB connection ERROR:");
-        console.error("Ensure your local MongoDB service is running, or check your Atlas URI.");
-        console.error(err.message);
-    });
+mongoose.connect(mongoURI, {
+    serverSelectionTimeoutMS: 30000, // Gives the cloud server 30 seconds to connect
+    family: 4                        // Forces IPv4 resolution to bypass DNS timeouts
+})
+.then(() => console.log("🟢 Successfully connected to MongoDB Atlas"))
+.catch((err) => {
+    console.error("🔴 MongoDB connection ERROR:", err.message);
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/employees', employeeRoutes);
