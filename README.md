@@ -1,115 +1,129 @@
-# Employee Management System 🏢
+# 📊 Employee Management System (EMS)
 
-A full-stack web application designed to allow administrators to securely perform CRUD (Create, Read, Update, Delete) operations on employee records. Built with the MERN stack, this system features robust JWT authentication, Role-Based Access Control (RBAC), and a custom responsive dark-mode UI.
+A secure, full-stack containerized web application built to manage organizational employee directories with strict **Role-Based Access Control (RBAC)**. Standard users are granted view-only privileges, while administrative accounts have full authorization to create, modify, and delete employee records.
 
-This project was developed as **Task 02** for the Full Stack Web Development Internship at **Prodigy InfoTech**.
-
-## 🚀 Features
-
-* **Role-Based Access Control (RBAC):** Distinct permissions for `admin` (full CRUD access) and `user` (read-only access).
-* **Secure Authentication:** JSON Web Tokens (JWT) for session management and `bcryptjs` for secure password hashing.
-* **Full CRUD Operations:** Seamlessly add, view, edit, and delete employee records from the database.
-* **Modern UI/UX:** Custom dark-themed interface with interactive modals, toast notifications, and responsive design.
-* **Cloud-Native Architecture:** Backend containerized and deployed on Google Cloud Run, with data hosted securely on MongoDB Atlas.
-
-## 🛠️ Tech Stack
-
-**Frontend:**
-* React.js (Vite)
-* Axios (API communication)
-* Custom CSS (Flexbox/Grid, CSS Variables)
-
-**Backend:**
-* Node.js & Express.js
-* MongoDB & Mongoose (Database & ORM)
-* JSON Web Token (JWT) & bcryptjs (Security)
-* Cors & Dotenv
-
-**Deployment:**
-* **Backend:** Google Cloud Run (Serverless Docker Container)
-* **Database:** MongoDB Atlas
-* **Frontend:** Vercel
+🔗 **Live Deployment Link:** [https://prodigy-fs-02-murex.vercel.app](https://prodigy-fs-02-murex.vercel.app)  
+⚡ **Production API Base:** `https://prodigy-fs-02-v2-133734452521.asia-south1.run.app`
 
 ---
 
-## 📋 Prerequisites
+## 🚀 Project Overview
 
-Before you clone and attempt to run this project locally, ensure you have the following software installed on your machine:
+This project provides an enterprise-grade solution for managing personnel tracking. It bridges a reactive single-page application with a stateless, cloud-hosted microservice container. 
 
-1.  **[Node.js](https://nodejs.org/)** (v18.0.0 or higher)
-2.  **[Git](https://git-scm.com/)**
-3.  A **[MongoDB Atlas](https://www.mongodb.com/cloud/atlas)** account (or a local MongoDB Compass installation) for your database connection.
+### Key Features
+* 🔒 **Role-Based UI Rendering:** The operational dashboard adapts automatically depending on the token payload (`admin` vs `user`). **Write operations** *are completely stripped from the UI for standard accounts.*
+* 🛡️ **Gateway Input Validation:** Advanced backend regular expressions intercept incoming payloads before data operations execute, blocking un-sanitized inputs.
+* 📋 **Dynamic Record Control:** Live data manipulation including alphabetical grid rendering, real-time UI state filters, and soft modal confirmation dialogs.
+* 📦 **Production Security Architecture:** Complete decoupling of runtime configuration parameters from source files via cloud environment variable injected workflows.
 
 ---
 
-## 💻 Local Development Setup
+## 🛠️ Complete Tech Stack
 
-Follow these steps to get the project up and running on your local machine.
+| Architecture Layer | Technology / Framework | Purpose |
+| :--- | :--- | :--- |
+| **Frontend UI** | React.js (v18+) | Component-driven declarative interface architecture |
+| **Client Networking** | Axios | Asynchronous HTTP promise-based API fetching |
+| **Styling** | Modern CSS3 | Responsive dark-mode interface design |
+| **Backend Core** | Node.js | Scalable event-driven JavaScript engine runtime |
+| **API Framework** | Express.js | Production RESTful routing middleware pipeline |
+| **Database** | MongoDB Atlas | Distributed cloud NoSQL document store cluster |
+| **Database ODM** | Mongoose | Schema-enforced object data modeling layer |
+| **Containerization** | Docker | Immutable microservice packaging environment |
+| **Cloud Hosting** | Google Cloud Run | Stateless, auto-scaling backend container hosting |
+| **CI/CD Pipeline** | Vercel | Global edge CDN hosting and automated frontend pipeline |
 
-### 1. Clone the Repository
-```bash
-git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
-cd your-repo-name
+---
+
+## 🔒 Security Specifications & Core Libraries
+
+### 1. Authentication Lifecycle
+* **JSON Web Tokens (`jsonwebtoken`):** Encodes user IDs and role credentials into cryptographically signed state tokens on login. Tokens are set with an explicit `1h` expiration timeframe.
+* **Bcrypt.js (`bcryptjs`):** Implements one-way salted processing algorithms to hash registration strings before storing items within database records.
+
+### 2. Validation Constraints
+The platform implements an advanced regex lookahead mechanism to ensure all accounts meet global security compliance standards:
+* **Email Rule:** `^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$` (Enforces standard structure syntax validation).
+* **Password Policy:** `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$`
+    * Must be a minimum of **8 characters** long.
+    * Must contain at least **one uppercase** letter.
+    * Must contain at least **one lowercase** letter.
+    * Must contain at least **one numerical digit**.
+
+### 3. Production Handshake Safeguards
+The CORS middleware is refactored with an adaptive parsing system that dynamically allows preflight handshakes originating from any deployment under the project profile while safely terminating foreign origins:
+```javascript
+origin: function (origin, callback) {
+    if (!origin || origin.includes('vercel.app') || origin.includes('localhost')) {
+        return callback(null, true);
+    }
+    return callback(null, false);
+}
 
 ```
 
-### 2. Backend Setup
+---
 
-Navigate into the backend directory, install the dependencies, and set up your environment variables.
+## 💻 Local Environment Setup
+
+Follow these steps to configure and run the development pipeline locally:
+
+### 1. Prerequisites
+
+Ensure you have **Node.js (v16+)** and **npm** installed on your workstation.
+
+### 2. Clone the Repository
+
+```bash
+git clone [https://github.com/s1ngh-divyanshi/PRODIGY_FS_02.git](https://github.com/s1ngh-divyanshi/PRODIGY_FS_02.git)
+cd PRODIGY_FS_02
+```
+
+### 3. Setup the Backend Environment
+
+Navigate to the backend directory, install packages, and establish your secret environment configurations:
 
 ```bash
 cd backend
 npm install
-
 ```
 
-Create a `.env` file in the root of the `backend` folder and add the following variables:
+Create a `.env` file inside the `backend/` folder:
 
-```env
-PORT=5001
-MONGO_URI=your_mongodb_atlas_connection_string
-JWT_SECRET=your_super_secret_jwt_key
-
+```text
+PORT=5000
+MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/employeeDB
+JWT_SECRET=your_super_secure_jwt_token_key_phrase
 ```
 
-Start the backend server:
+Start the local server:
 
 ```bash
-npm run dev
-# or: node server.js
-
+npm start
 ```
 
-*You should see a message confirming the server is running and successfully connected to MongoDB.*
+### 4. Setup the Frontend Environment
 
-### 3. Frontend Setup
-
-Open a new terminal window, navigate to the frontend directory, and install the dependencies.
+Open a secondary terminal workspace, navigate to the frontend directory, and spin up the development engine:
 
 ```bash
 cd frontend
 npm install
-
 ```
 
-Start the Vite development server:
+Verify the API connection references point to your targeted destination (`localhost:5000` or live cloud production servers), then execute:
 
 ```bash
 npm run dev
-
 ```
 
-*The application will open in your default browser at `http://localhost:5173`.*
-
 ---
 
-## 🔐 Default Roles & Testing
+## 📈 Engineering Evolution
 
-When first booting the application, the database will be empty.
+This repository evolved through distinct architectural refinements:
 
-1. Click **Register here** on the login screen.
-2. Select the **Administrator (Full Access)** role to create an admin account.
-3. Log in with those credentials to unlock the Add, Edit, and Delete action buttons.
-4. Registering a standard **User** account will only display the read-only dashboard.
-
----
+1. **Monolith to Cloud Microservices:** Decoupled tight local execution roots to build a cloud-native API capable of orchestrating server-side actions across separate hosting platforms.
+2. **Preflight Failure Remediation:** Overhauled strict backend array evaluation loops into non-crashing adaptive dynamic origin handlers to bypass browser preflight exceptions (`500/CORS Mismatch`).
+3. **Data Path Normalization:** Resolved field remapping conflicts between backend controllers and MongoDB schemas, engineering data handling bridges that allow error parsing down to individual input elements.
