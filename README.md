@@ -1,129 +1,81 @@
 # 📊 Employee Management System (EMS)
 
-A secure, full-stack containerized web application built to manage organizational employee directories with strict **Role-Based Access Control (RBAC)**. Standard users are granted view-only privileges, while administrative accounts have full authorization to create, modify, and delete employee records.
+A full-stack, containerized web application with **Role-Based Access Control (RBAC)**. Standard users have view-only access; administrators have full CRUD privileges for employee records.
 
-🔗 **Live Deployment Link:** [https://prodigy-fs-02-murex.vercel.app](https://prodigy-fs-02-murex.vercel.app)  
-⚡ **Production API Base:** `https://prodigy-fs-02-v2-133734452521.asia-south1.run.app`
-
----
-
-## 🚀 Project Overview
-
-This project provides an enterprise-grade solution for managing personnel tracking. It bridges a reactive single-page application with a stateless, cloud-hosted microservice container. 
-
-### Key Features
-* 🔒 **Role-Based UI Rendering:** The operational dashboard adapts automatically depending on the token payload (`admin` vs `user`). **Write operations** *are completely stripped from the UI for standard accounts.*
-* 🛡️ **Gateway Input Validation:** Advanced backend regular expressions intercept incoming payloads before data operations execute, blocking un-sanitized inputs.
-* 📋 **Dynamic Record Control:** Live data manipulation including alphabetical grid rendering, real-time UI state filters, and soft modal confirmation dialogs.
-* 📦 **Production Security Architecture:** Complete decoupling of runtime configuration parameters from source files via cloud environment variable injected workflows.
+🔗 **Live Link:** [prodigy-fs-02-murex.vercel.app](https://prodigy-fs-02-murex.vercel.app)  
+⚡ **API Base:** `https://prodigy-fs-02-v2-133734452521.asia-south1.run.app`
 
 ---
 
-## 🛠️ Complete Tech Stack
+## 🚀 Key Features
 
-| Architecture Layer | Technology / Framework | Purpose |
-| :--- | :--- | :--- |
-| **Frontend UI** | React.js (v18+) | Component-driven declarative interface architecture |
-| **Client Networking** | Axios | Asynchronous HTTP promise-based API fetching |
-| **Styling** | Modern CSS3 | Responsive dark-mode interface design |
-| **Backend Core** | Node.js | Scalable event-driven JavaScript engine runtime |
-| **API Framework** | Express.js | Production RESTful routing middleware pipeline |
-| **Database** | MongoDB Atlas | Distributed cloud NoSQL document store cluster |
-| **Database ODM** | Mongoose | Schema-enforced object data modeling layer |
-| **Containerization** | Docker | Immutable microservice packaging environment |
-| **Cloud Hosting** | Google Cloud Run | Stateless, auto-scaling backend container hosting |
-| **CI/CD Pipeline** | Vercel | Global edge CDN hosting and automated frontend pipeline |
+* 🔒 **Dynamic RBAC:** UI adapts automatically based on token payload (`admin` vs `user`), completely hiding write operations from standard accounts.
+* 🛡️ **Server-Side Validation:** Enforces strict regex validation for emails and complex passwords directly at the API gateway.
+* 📋 **Live Data Control:** Real-time search filter, alphabetical rendering, and modal confirm dialogs.
+* 📦 **Cloud-Native Architecture:** Complete separation of concerns with environment variables and decoupled frontend/backend services.
 
 ---
 
-## 🔒 Security Specifications & Core Libraries
+## 🛠️ Tech Stack
 
-### 1. Authentication Lifecycle
-* **JSON Web Tokens (`jsonwebtoken`):** Encodes user IDs and role credentials into cryptographically signed state tokens on login. Tokens are set with an explicit `1h` expiration timeframe.
-* **Bcrypt.js (`bcryptjs`):** Implements one-way salted processing algorithms to hash registration strings before storing items within database records.
-
-### 2. Validation Constraints
-The platform implements an advanced regex lookahead mechanism to ensure all accounts meet global security compliance standards:
-* **Email Rule:** `^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$` (Enforces standard structure syntax validation).
-* **Password Policy:** `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$`
-    * Must be a minimum of **8 characters** long.
-    * Must contain at least **one uppercase** letter.
-    * Must contain at least **one lowercase** letter.
-    * Must contain at least **one numerical digit**.
-
-### 3. Production Handshake Safeguards
-The CORS middleware is refactored with an adaptive parsing system that dynamically allows preflight handshakes originating from any deployment under the project profile while safely terminating foreign origins:
-```javascript
-origin: function (origin, callback) {
-    if (!origin || origin.includes('vercel.app') || origin.includes('localhost')) {
-        return callback(null, true);
-    }
-    return callback(null, false);
-}
-
-```
+* **Frontend:** React.js (v18+), Axios, CSS3 (Modern Dark Mode)
+* **Backend:** Node.js, Express.js
+* **Database:** MongoDB Atlas, Mongoose ODM
+* **Deployment:** Docker, Google Cloud Run (Backend), Vercel (Frontend)
 
 ---
 
-## 💻 Local Environment Setup
+## 🔒 Security & Validation Specs
 
-Follow these steps to configure and run the development pipeline locally:
+* **Authentication:** **JSON Web Tokens (JWT)** with 1-hour expiration; **Bcrypt.js** for secure password hashing.
+* **Email Rules:** Strict structural pattern matching.
+* **Password Policy:** Minimum 8 characters, requiring at least one uppercase letter, one lowercase letter, and one number.
+* **CORS Safe-Handshake:** Dynamically whitelists local environments and Vercel production edge subdomains while turning away unauthorized traffic.
 
-### 1. Prerequisites
+---
 
-Ensure you have **Node.js (v16+)** and **npm** installed on your workstation.
+## 💻 Quick Start (Local Setup)
 
-### 2. Clone the Repository
-
+### 1. Clone & Prerequisites
+Ensure **Node.js (v16+)** is installed.
 ```bash
 git clone [https://github.com/s1ngh-divyanshi/PRODIGY_FS_02.git](https://github.com/s1ngh-divyanshi/PRODIGY_FS_02.git)
 cd PRODIGY_FS_02
 ```
 
-### 3. Setup the Backend Environment
-
-Navigate to the backend directory, install packages, and establish your secret environment configurations:
+### 2. Backend Setup
 
 ```bash
 cd backend
 npm install
 ```
 
-Create a `.env` file inside the `backend/` folder:
+Create a `backend/.env` file:
 
 ```text
 PORT=5000
-MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/employeeDB
-JWT_SECRET=your_super_secure_jwt_token_key_phrase
+MONGO_URI=your_mongodb_atlas_connection_string
+JWT_SECRET=your_secure_jwt_secret_key
 ```
-
-Start the local server:
 
 ```bash
 npm start
 ```
 
-### 4. Setup the Frontend Environment
+### 3. Frontend Setup
 
-Open a secondary terminal workspace, navigate to the frontend directory, and spin up the development engine:
+Open a new terminal window:
 
 ```bash
 cd frontend
 npm install
-```
-
-Verify the API connection references point to your targeted destination (`localhost:5000` or live cloud production servers), then execute:
-
-```bash
 npm run dev
 ```
 
 ---
 
-## 📈 Engineering Evolution
+## 📈 Architecture Evolution
 
-This repository evolved through distinct architectural refinements:
-
-1. **Monolith to Cloud Microservices:** Decoupled tight local execution roots to build a cloud-native API capable of orchestrating server-side actions across separate hosting platforms.
-2. **Preflight Failure Remediation:** Overhauled strict backend array evaluation loops into non-crashing adaptive dynamic origin handlers to bypass browser preflight exceptions (`500/CORS Mismatch`).
-3. **Data Path Normalization:** Resolved field remapping conflicts between backend controllers and MongoDB schemas, engineering data handling bridges that allow error parsing down to individual input elements.
+1. **Decoupled Infrastructure:** Transformed a monolithic framework into an automated microservice cluster spanning distinct cloud environments.
+2. **Preflight Optimization:** Resolved `500/CORS` mismatch issues by introducing non-crashing adaptive preflight handshake bridges.
+3. **Data Normalization:** Built robust alignment layers between incoming request bodies and MongoDB schemas to support clean, field-specific error rendering on the frontend UI.
