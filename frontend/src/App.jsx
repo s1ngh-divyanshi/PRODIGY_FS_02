@@ -56,7 +56,7 @@ function App() {
         setEmail('');
         setPassword('');
       } else {
-        await axios.post(`${AUTH_URL}/login`, { username: email, password });
+        const response = await axios.post(`${AUTH_URL}/login`, { username: email, password });
         setToken(response.data.token);
         setRole(response.data.role); 
         localStorage.setItem('token', response.data.token);
