@@ -1,19 +1,20 @@
-// production test
-const [emailError, setEmailError] = useState('');
-const [passwordError, setPasswordError] = useState('');
-const [generalError, setGeneralError] = useState('');
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 
 function App() {
   // --- AUTHENTICATION STATE ---
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [token, setToken] = useState(localStorage.getItem('token') || null);
-  const [role, setRole] = useState(localStorage.getItem('role') || null); // NEW: Track role
+  const [role, setRole] = useState(localStorage.getItem('role') || null); 
   const [isRegisterMode, setIsRegisterMode] = useState(false);
-  const [authData, setAuthData] = useState({ username: '', password: '', role: 'user' }); // Added role to form
-  const [authError, setAuthError] = useState(null);
-  const [successModal, setSuccessModal] = useState(false); // NEW: Custom success modal
+  const [successModal, setSuccessModal] = useState(false); 
+
+  // --- VALIDATION ERROR STATES ---
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [generalError, setGeneralError] = useState('');
 
   // --- EMPLOYEE STATE ---
   const [employees, setEmployees] = useState([]);
@@ -34,28 +35,49 @@ function App() {
     if (token) fetchEmployees();
   }, [token]);
 
-  const handleAuthChange = (e) => {
-    setAuthData({ ...authData, [e.target.name]: e.target.value });
-  };
-
+  // Handles Auth Form Submission (Login & Registration)
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
-    setAuthError(null);
+    setEmailError('');
+    setPasswordError('');
+    setGeneralError('');
+
     try {
       if (isRegisterMode) {
-        await axios.post(`${AUTH_URL}/register`, authData);
-        setSuccessModal(true); // Trigger custom pop-up instead of alert()
+        // Send both keys explicitly so it matches any backend controller setup
+        await axios.post(`${AUTH_URL}/register`, { 
+          username: email, 
+          email: email, 
+          password: password, 
+          role: 'user' 
+        });
+        setSuccessModal(true); 
         setIsRegisterMode(false);
+        setEmail('');
+        setPassword('');
       } else {
-        const response = await axios.post(`${AUTH_URL}/login`, authData);
+        await axios.post(`${AUTH_URL}/login`, { username: email, password });
         setToken(response.data.token);
-        setRole(response.data.role); // Save role
+        setRole(response.data.role); 
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('role', response.data.role); // Persist role
+        localStorage.setItem('role', response.data.role); 
+        setEmail('');
+        setPassword('');
       }
-      setAuthData({ username: '', password: '', role: 'user' });
     } catch (err) {
-      setAuthError(err.response?.data?.message || "Authentication failed.");
+      const serverMessage = err.response?.data?.message || "Authentication failed.";
+      const cleanMessage = serverMessage
+        .replace(/^User validation failed:\s*/i, '')
+        .replace(/^(email|username):\s*/i, '')
+        .trim();
+      
+      if (serverMessage.includes('E11000') || serverMessage.toLowerCase().includes('duplicate')) {
+        setEmailError('This email address is already registered.');
+      } else if (serverMessage.toLowerCase().includes('password')) {
+        setPasswordError(cleanMessage);
+      } else {
+        setEmailError(cleanMessage);
+      }
     }
   };
 
@@ -79,29 +101,23 @@ function App() {
 
   const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
+  // Handles Employee Database Management (Add / Update)
+  const handleEmployeeSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     try {
-        // Clear previous errors before sending request
-        setEmailError('');
-        setPasswordError('');
-        setGeneralError('');
-
-        await axios.post('https://YOUR_BACKEND_URL/api/auth/register', { email, password, role });
-        // Handle successful registration here (e.g., redirect or login)
-
+      if (editId) {
+        // Update existing record
+        await axios.put(`${API_URL}/${editId}`, formData, getAuthHeaders());
+        setEditId(null);
+      } else {
+        // Create new employee
+        await axios.post(API_URL, formData, getAuthHeaders());
+      }
+      setFormData({ name: '', position: '', department: '' });
+      fetchEmployees();
     } catch (err) {
-        const serverMessage = err.response?.data?.message || "";
-        
-        // Parse the message string to find the culprit
-        if (serverMessage.toLowerCase().includes('email')) {
-            setEmailError('Please enter a valid email address.');
-        } else if (serverMessage.toLowerCase().includes('password')) {
-            setPasswordError('Password must be at least 8 characters long.');
-        } else {
-            setGeneralError(serverMessage || 'An unexpected error occurred.');
-        }
+      setError(err.response?.data?.message || "Operation failed to execute.");
     }
   };
 
@@ -122,43 +138,53 @@ function App() {
   };
 
   // ==========================================
-  // LOGIN SCREEN
+  // AUTENTICATION / LANDING SCREEN
   // ==========================================
   if (!token) {
     return (
       <div className="dashboard-container auth-wrapper">
         <div className="form-card auth-card">
           <h2>{isRegisterMode ? "Create Account" : "System Login"}</h2>
-          {authError && <div className="error-banner">{authError}</div>}
+          {generalError && <div className="error-banner">{generalError}</div>}
           
-          <form onSubmit={handleRegister}> {generalError && <div className="error-general">{generalError}</div>}
-
+          <form onSubmit={handleAuthSubmit}>
             <div className="input-group">
-                <label>Email</label>
-                <input 
-                    type="email" 
-                    value={email} 
-                    onChange={(e) => setEmail(e.target.value)}
-                    style={{ borderColor: emailError ? '#ef4444' : '' }} 
-                />
-                {emailError && <span style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px', display: 'block' }}>{emailError}</span>}
+              <label>Email Address</label>
+              <input 
+                type="email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@company.com"
+                style={{ borderColor: emailError ? '#ef4444' : '' }} 
+                required
+              />
+              {emailError && <span style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px', display: 'block' }}>{emailError}</span>}
             </div>
 
             <div className="input-group" style={{ marginTop: '15px' }}>
-                <label>Password</label>
-                <input 
-                    type="password" 
-                    value={password} 
-                    onChange={(e) => setPassword(e.target.value)}
-                    style={{ borderColor: passwordError ? '#ef4444' : '' }} 
-                />
-                {passwordError && <span style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px', display: 'block' }}>{passwordError}</span>}
+              <label>Password</label>
+              <input 
+                type="password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                style={{ borderColor: passwordError ? '#ef4444' : '' }} 
+                required
+              />
+              {passwordError && <span style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px', display: 'block' }}>{passwordError}</span>}
             </div>
 
-              <button type="submit">Register</button>
+            <button type="submit" style={{ marginTop: '20px' }}>
+              {isRegisterMode ? "Register Account" : "Login"}
+            </button>
           </form>
           
-          <p className="auth-toggle" onClick={() => setIsRegisterMode(!isRegisterMode)}>
+          <p className="auth-toggle" onClick={() => {
+            setIsRegisterMode(!isRegisterMode);
+            setEmailError('');
+            setPasswordError('');
+            setGeneralError('');
+          }}>
             {isRegisterMode ? "Already have an account? Login here." : "Need an account? Register here."}
           </p>
         </div>
@@ -178,14 +204,14 @@ function App() {
   }
 
   // ==========================================
-  // SECURE DASHBOARD
+  // SECURE EMPLOYEE DASHBOARD
   // ==========================================
   return (
     <div className="dashboard-container">
       <header className="dashboard-header flex-header">
         <div>
-            <h1>Employee Management System</h1>
-            <span style={{color: '#94a3b8', fontSize: '0.9rem'}}>Logged in as: <strong>{role ? role.toUpperCase() : 'USER'}</strong></span>
+          <h1>Employee Management System</h1>
+          <span style={{color: '#94a3b8', fontSize: '0.9rem'}}>Logged in as: <strong>{role ? role.toUpperCase() : 'USER'}</strong></span>
         </div>
         <button onClick={handleLogout} className="btn btn-secondary logout-btn">Logout</button>
       </header>
@@ -195,7 +221,7 @@ function App() {
       {/* Conditionally render the Add Form ONLY if the role is 'admin' */}
       {role === 'admin' && (
         <div className="form-card">
-          <form onSubmit={handleSubmit} className="employee-form">
+          <form onSubmit={handleEmployeeSubmit} className="employee-form">
             <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleInputChange} required />
             <input type="text" name="position" placeholder="Position" value={formData.position} onChange={handleInputChange} required />
             <input type="text" name="department" placeholder="Department" value={formData.department} onChange={handleInputChange} required />
@@ -213,7 +239,6 @@ function App() {
               <th>Name</th>
               <th>Position</th>
               <th>Department</th>
-              {/* Only show Actions column header if admin */}
               {role === 'admin' && <th>Actions</th>}
             </tr>
           </thead>
@@ -225,7 +250,6 @@ function App() {
                   <td>{emp.position}</td>
                   <td>{emp.department}</td>
                   
-                  {/* Only show Edit/Delete buttons if admin */}
                   {role === 'admin' && (
                     <td className="actions-cell">
                       <button onClick={() => setEmployeeToEdit(emp)} className="btn btn-secondary">Edit</button>
